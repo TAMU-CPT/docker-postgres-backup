@@ -2,11 +2,9 @@ FROM postgres:9.6-alpine
 MAINTAINER Eric Rasche <esr@tamu.edu>
 
 RUN apk update && \
-	apk add curl wget netcat postgresql-client postgresql-dev
+	apk add curl wget postgresql-client postgresql-dev
 
-RUN curl https://dl.minio.io/client/mc/release/linux-amd64/mc > /usr/local/bin/mc && \
-	chmod +x /usr/local/bin/mc && \
-	mkdir /backup
+RUN mkdir /backup
 
 VOLUME ["/backup"]
 
