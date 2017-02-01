@@ -1,4 +1,4 @@
-# docker-postgres-backup
+# docker-postgres-backup [![Docker Repository on Quay](https://quay.io/repository/tamu_cpt/postgres-backup/status "Docker Repository on Quay")](https://quay.io/repository/tamu_cpt/postgres-backup)
 
 This image runs pg_dumpall to backup data using cronjob to folder `/backup`
 
