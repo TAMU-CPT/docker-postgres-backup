@@ -6,17 +6,12 @@ minio:
 
 
 postgres:
-  image: postgres
-  environment:
-    - POSTGRES_PASSWORD=blabla
-    - POSTGRES_USER=deploy
-    - POSTGRES_DB=test
-
+    image: {}postgres:9.5
 
 backupdb:
   environment:
     POSTGRES_DB: test
-    CRON_TIME: '* * * * *'
+    CRON_TIME: '0 0 * * *'
     #INIT_RESTORE_URL: myminio/databases/blabla.sql
     INIT_BACKUP: 'true'
     MINIO_ACCESS_KEY: NKZ1L29S4GP01J6IOD6F

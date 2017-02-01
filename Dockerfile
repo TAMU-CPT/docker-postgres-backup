@@ -1,24 +1,18 @@
-FROM ubuntu
-MAINTAINER Joan Marc Carbo <jmcarbo@gmail.com>
+FROM postgres:9.6-alpine
+MAINTAINER Eric Rasche <esr@tamu.edu>
 
-RUN apt-get update && \
-    apt-get install -y wget curl netcat cron
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main 9.5" >/etc/apt/sources.list.d/postgresql.list
-RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-RUN apt-get update && \
-    apt-get install -y postgresql-9.6 curl && \
-    curl https://dl.minio.io/client/mc/release/linux-amd64/mc > /usr/local/bin/mc && \
-    chmod +x /usr/local/bin/mc && \ 
-    mkdir /backup
+RUN apk update && \
+	apk add curl wget netcat postgresql-client postgresql-dev
 
-ENV CRON_TIME="0 0 * * *" \
-    PG_DB="--all-databases"
+RUN curl https://dl.minio.io/client/mc/release/linux-amd64/mc > /usr/local/bin/mc && \
+	chmod +x /usr/local/bin/mc && \
+	mkdir /backup
 
-ADD restic_app /usr/local/bin/restic
-RUN chmod +x /usr/local/bin/restic
+VOLUME ["/backup"]
+
+ENV CRON_TIME="0 0 * * *"
 
 ADD run.sh /run.sh
 RUN chmod +x /run.sh
-VOLUME ["/backup"]
 
 CMD ["/run.sh"]

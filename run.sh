@@ -1,29 +1,9 @@
 #!/bin/bash
 
-if [ "${POSTGRES_ENV_POSTGRES_PASSWORD}" == "**Random**" ]; then
-        unset POSTGRES_ENV_POSTGRES_PASSWORD
-fi
+BACKUP_CMD="pg_dumpall -f /backup/\${BACKUP_NAME} ${EXTRA_OPTS}"
 
-RESTIC_PASSWORD=${RESTIC_PASSWORD:-$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c16)}
-POSTGRES_HOST=${POSTGRES_PORT_5432_TCP_ADDR:-${POSTGRES_HOST}}
-POSTGRES_HOST=${POSTGRES_PORT_1_5432_TCP_ADDR:-${POSTGRES_HOST}}
-POSTGRES_PORT=${POSTGRES_PORT_5432_TCP_PORT:-${POSTGRES_PORT}}
-POSTGRES_PORT=${POSTGRES_PORT_1_3306_TCP_PORT:-${POSTGRES_PORT}}
-POSTGRES_USER=${POSTGRES_USER:-${POSTGRES_ENV_POSTGRES_USER}}
-POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-${POSTGRES_ENV_POSTGRES_PASSWORD}}
-
-[ -z "${POSTGRES_HOST}" ] && { echo "=> POSTGRES_HOST cannot be empty" && exit 1; }
-[ -z "${POSTGRES_PORT}" ] && { echo "=> POSTGRES_PORT cannot be empty" && exit 1; }
-[ -z "${POSTGRES_USER}" ] && { echo "=> POSTGRES_USER cannot be empty" && exit 1; }
-[ -z "${POSTGRES_PASSWORD}" ] && { echo "=> POSTGRES_PASSWORD cannot be empty" && exit 1; }
-[ -z "${POSTGRES_DB}" ] && { echo "=> POSTGRES_DB cannot be empty" && exit 1; }
-
-export PGPASSWORD="${POSTGRES_PASSWORD}"
-
-BACKUP_CMD="pg_dump -h ${POSTGRES_HOST} -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -f /backup/\${BACKUP_NAME} ${EXTRA_OPTS} ${POSTGRES_DB}"
-
-echo ${MINIO_HOST}
 if [ -n "${MINIO_HOST}" ]; then
+	echo "Storing to MINIO"
 	[ -z "${MINIO_HOST_URL}" ] && { echo "=> MINIO_HOST_URL cannot be empty" && exit 1; }
 	[ -z "${MINIO_ACCESS_KEY}" ] && { echo "=> MINIO_ACCESS_KEY cannot be empty" && exit 1; }
 	[ -z "${MINIO_SECRET_KEY}" ] && { echo "=> MINIO_SECRET_KEY cannot be empty" && exit 1; }
@@ -49,12 +29,10 @@ cat <<EOF >"$HOME/.mc/config.json"
 	}
 }
 EOF
-	echo $RESTIC_PASSWORD
-
-        mc ls "${MINIO_HOST}/${MINIO_BUCKET}"
-        if [[ $? -eq 1 ]];
+	mc ls "${MINIO_HOST}/${MINIO_BUCKET}"
+	if [[ $? -eq 1 ]];
 	then 
-	        mc mb "${MINIO_HOST}/${MINIO_BUCKET}" 
+		mc mb "${MINIO_HOST}/${MINIO_BUCKET}" 
 		echo "Bucket ${MINIO_BUCKET} created" 
 		echo "$RESTIC_PASSWORD"	| mc pipe "${MINIO_HOST}/${MINIO_BUCKET}/restic_password.txt"
 		mc mb "${MINIO_HOST}/${MINIO_BUCKET}restic"
@@ -62,7 +40,7 @@ EOF
 		export AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
 		export RESTIC_PASSWORD
 		restic -r "s3:${MINIO_HOST_URL}/${MINIO_BUCKET}restic" init
-	else 
+	else
 		echo "Bucket ${MINIO_BUCKET} already exists" 
 		RESTIC_PASSWORD=$(mc cat "${MINIO_HOST}/${MINIO_BUCKET}/restic_password.txt")
 	fi
