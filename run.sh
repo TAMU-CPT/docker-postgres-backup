@@ -19,11 +19,11 @@ else
 fi
 
 if [ -n "\${MAX_BACKUPS}" ]; then
-    while [ \$(ls /backup -N1 | wc -l) -gt \${MAX_BACKUPS} ];
+    while [ \$(find /backup -type f | wc -l) -gt \${MAX_BACKUPS} ];
     do
-        BACKUP_TO_BE_DELETED=\$(ls /backup -N1 | sort | head -n 1)
+        BACKUP_TO_BE_DELETED=\$(find /backup -type f | sort | head -n 1)
         echo "   Backup \${BACKUP_TO_BE_DELETED} is deleted"
-        rm -rf /backup/\${BACKUP_TO_BE_DELETED}
+        rm -f /backup/\${BACKUP_TO_BE_DELETED}
     done
 fi
 echo "=> Backup done"
@@ -58,7 +58,7 @@ elif [ -n "${INIT_RESTORE_LATEST}" ]; then
         echo "waiting database container..."
         sleep 1
     done
-    ls -d -1 /backup/* | tail -1 | xargs /restore.sh
+    find /backup/ -type f | tail -1 | xargs /restore.sh
 fi
 
 echo "${CRON_TIME} /backup.sh >> /postgres_backup.log 2>&1" > /rontab.conf
