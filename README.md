@@ -26,12 +26,6 @@ This image runs pg_dumpall to backup data using cronjob to folder `/backup`
     INIT_BACKUP     if set, create a backup when the container starts
     INIT_RESTORE_LATEST if set, restores latest backup
 
-    INIT_RESTORE_URL restore from minio url ex: myminio/bla/file.sql 
-    MINIO_HOST name of minio host ex: myminio
-    MINIO_HOST_URL ex: https://myminio.my.io
-    MINIO_ACCESS_KEY minio access key
-    MINIO_SECRET_KEY minio secret key
-
 ## Restore from a backup
 
 See the list of backups, you can run:
