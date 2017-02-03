@@ -61,7 +61,7 @@ elif [ -n "${INIT_RESTORE_LATEST}" ]; then
     find /backup/ -type f | tail -1 | xargs /restore.sh
 fi
 
-echo "${CRON_TIME} /backup.sh >> /postgres_backup.log 2>&1" > /rontab.conf
+echo "${CRON_TIME} /backup.sh >> /postgres_backup.log 2>&1" > /crontab.conf
 crontab  /crontab.conf
 echo "=> Running cron job"
 exec crond -f -d8
