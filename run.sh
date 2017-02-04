@@ -4,7 +4,7 @@ BACKUP_CMD="pg_dumpall -f /backup/\${BACKUP_NAME} ${EXTRA_OPTS}"
 
 echo "=> Creating backup script"
 rm -f /backup.sh
-cat <<EOF >> /backup/backup.sh
+cat <<EOF >> /backup.sh
 #!/bin/bash
 MAX_BACKUPS=${MAX_BACKUPS}
 
@@ -19,20 +19,20 @@ else
 fi
 
 if [ -n "\${MAX_BACKUPS}" ]; then
-    while [ \$(find /backup -type f -name '*.sql' | wc -l) -gt \${MAX_BACKUPS} ];
+    while [ \$(find /backup -type f | wc -l) -gt \${MAX_BACKUPS} ];
     do
-        BACKUP_TO_BE_DELETED=\$(find /backup -type f -name '*.sql' | sort | head -n 1)
+        BACKUP_TO_BE_DELETED=\$(find /backup -type f | sort | head -n 1)
         echo "   Backup \${BACKUP_TO_BE_DELETED} is deleted"
         rm -f /backup/\${BACKUP_TO_BE_DELETED}
     done
 fi
 echo "=> Backup done"
 EOF
-chmod +x /backup/backup.sh
+chmod +x /backup.sh
 
 echo "=> Creating restore script"
 rm -f /restore.sh
-cat <<EOF >> /backup/restore.sh
+cat <<EOF >> /restore.sh
 #!/bin/bash
 
 echo "=> Restore database from \$1"
@@ -43,14 +43,14 @@ else
 fi
 echo "=> Done"
 EOF
-chmod +x /backup/restore.sh
+chmod +x /restore.sh
 
-touch /backup/postgres_backup.log
-tail -F /backup/postgres_backup.log &
+touch /postgres_backup.log
+tail -F /postgres_backup.log &
 
 if [ -n "${INIT_BACKUP}" ]; then
     echo "=> Create a backup on the startup"
-    /backup/backup.sh
+    /backup.sh
 elif [ -n "${INIT_RESTORE_LATEST}" ]; then
     echo "=> Restore latest backup"
     until pg_isready
@@ -58,10 +58,10 @@ elif [ -n "${INIT_RESTORE_LATEST}" ]; then
         echo "waiting database container..."
         sleep 1
     done
-    find /backup/ -type f -name '*.sql' | tail -1 | xargs /restore.sh
+    find /backup/ -type f | tail -1 | xargs /restore.sh
 fi
 
-echo "${CRON_TIME} /backup/backup.sh >> /backup/postgres_backup.log 2>&1" > /crontab.conf
+echo "${CRON_TIME} /backup.sh >> /postgres_backup.log 2>&1" > /crontab.conf
 crontab  /crontab.conf
 echo "=> Running cron job"
 exec crond -f -d8
