@@ -19,12 +19,10 @@ else
 fi
 
 if [ -n "\${MAX_BACKUPS}" ]; then
-    while [ \$(find /backup -type f | wc -l) -gt \${MAX_BACKUPS} ];
-    do
-        BACKUP_TO_BE_DELETED=\$(find /backup -type f | sort | head -n 1)
-        echo "   Backup \${BACKUP_TO_BE_DELETED} is deleted"
-        rm -f /backup/\${BACKUP_TO_BE_DELETED}
-    done
+	echo -n"  Removing "
+    find backup/2*.sql -mtime +\${MAX_BACKUPS};
+	# Done echoing, now remove.
+    find backup/2*.sql -mtime +\${MAX_BACKUPS} -exec rm '{}' \;
 fi
 echo "=> Backup done"
 EOF
