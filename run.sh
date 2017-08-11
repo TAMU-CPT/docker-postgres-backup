@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BACKUP_CMD="pg_dumpall -f /backup/\${BACKUP_NAME} ${EXTRA_OPTS}"
+BACKUP_CMD="pg_dump -f /backup/\${BACKUP_NAME} ${EXTRA_OPTS}"
 
 echo "=> Creating backup script"
 rm -f /backup.sh
