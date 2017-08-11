@@ -2,7 +2,7 @@ FROM postgres:9.6-alpine
 MAINTAINER Eric Rasche <esr@tamu.edu>
 
 RUN apk update && \
-	apk add curl wget postgresql-client postgresql-dev
+	apk add postgresql-client postgresql-dev
 
 RUN mkdir /backup
 
