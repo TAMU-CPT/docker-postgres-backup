@@ -8,7 +8,7 @@ cat <<EOF >> /backup.sh
 #!/bin/bash
 MAX_BACKUPS=${MAX_BACKUPS}
 
-BACKUP_NAME=\$(date +\%Y.\%m.\%d.\%H\%M\%S).sql
+BACKUP_NAME=\$(date +\%Y.\%m.\%d.\%H\%M\%S).sql.gz
 
 echo "=> Backup started: \${BACKUP_NAME}"
 if ${BACKUP_CMD} ;then
