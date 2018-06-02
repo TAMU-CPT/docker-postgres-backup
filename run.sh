@@ -20,9 +20,9 @@ fi
 
 if [ -n "\${MAX_BACKUPS}" ]; then
 	echo -n"  Removing "
-    find backup/2*.sql -mtime +\${MAX_BACKUPS};
+    find /backup/ -mtime +\${MAX_BACKUPS};
 	# Done echoing, now remove.
-    find backup/2*.sql -mtime +\${MAX_BACKUPS} -exec rm '{}' \;
+    find /backup/ -mtime +\${MAX_BACKUPS} -exec rm '{}' \;
 fi
 echo "=> Backup done"
 EOF
